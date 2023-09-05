@@ -1,0 +1,127 @@
+<div class="loader" *ngIf="loader">Please wait.</div>
+<header *ngIf="!loader">
+  <img class="picture" src="./assets/salad.jpg" alt="Salad" />
+  <h1 class="main-title">Salad</h1>
+  <p class="description">Delicious flavored salad !</p>
+</header>
+<main *ngIf="!loader">
+  <section>
+    <h2 class="subtitle">Overview</h2>
+    <dl class="features">
+      <dt class="feature-picture">
+        <div class="rate">
+          <i class="fa-solid fa-star fa-2xs"></i>
+          <i class="fa-solid fa-star fa-2xs"></i>
+          <i class="fa-solid fa-star-half-stroke fa-2xs"></i>
+          <i class="fa-regular fa-star fa-2xs"></i>
+          <i class="fa-regular fa-star fa-2xs"></i>
+        </div>
+      </dt>
+      <dd class="feature">Difficulty</dd>
+      <dt class="feature-picture feature-picture-decoration">7€</dt>
+      <dd class="feature">Cost</dd>
+      <dt class="feature-picture feature-picture-decoration">45min</dt>
+      <dd class="feature">Preparation time</dd>
+      <dt class="feature-picture feature-picture-decoration">0min</dt>
+      <dd class="feature">Cooking time</dd>
+      <dt class="feature-picture feature-picture-decoration">20min</dt>
+      <dd class="feature">Resting time</dd>
+    </dl>
+  </section>
+  <section>
+    <h2 class="subtitle">Ingredients</h2>
+    <form [formGroup]="ingredientForm" (submit)="onSave($event)">
+      <div class="item-handler">
+        Servings:
+        <button type="button" class="less-item" name="minus" value="minus">
+          -
+        </button>
+        <span>{{ ingredientsListLength }}</span>
+        <button
+          [disabled]="!ingredientForm.valid"
+          type="submit"
+          class="more-item"
+          name="plus"
+          value="plus"
+        >
+          +
+        </button>
+      </div>
+      <table>
+        <caption class="table-legend">
+          List of the recipe ingredients. Fill fields and click on plus button
+          to add ingredient to your recipe ! Click on minus button to remove it
+          !
+        </caption>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th><label for="name">Name</label></th>
+            <th><label for="quantity">Quantity</label></th>
+            <th><label for="metric">Metric</label></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td></td>
+            <td>
+              <input id="name" formControlName="name" />
+              <div class="warning" *ngIf="name!.errors?.['required']">
+                Name is required.
+              </div>
+              <div class="warning" *ngIf="name!.errors?.['maxlength']">
+                Name is too long.
+              </div>
+              <div class="warning" *ngIf="name!.errors?.['forbiddenString']">
+                Name is a word.
+              </div>
+            </td>
+            <td>
+              <input id="quantity" formControlName="quantity" />
+              <div class="warning" *ngIf="quantity!.errors?.['required']">
+                Quantity is required.
+              </div>
+              <div
+                class="warning"
+                *ngIf="quantity!.errors?.['forbiddenString']"
+              >
+                Quantity is a positive number.
+              </div>
+              <div class="warning" *ngIf="quantity!.errors?.['pattern']">
+                Quantity is a positive number.
+              </div>
+            </td>
+            <td>
+              <input id="metric" formControlName="metric" />
+              <div class="warning" *ngIf="metric!.errors?.['required']">
+                Metric is required.
+              </div>
+              <div class="warning" *ngIf="metric!.errors?.['maxlength']">
+                Metric is too long.
+              </div>
+              <div class="warning" *ngIf="metric!.errors?.['forbiddenString']">
+                Metric is a word.
+              </div>
+            </td>
+          </tr>
+          <tr *ngIf="error">
+            <td class="warning" colspan="4">{{ errorMessage }}</td>
+          </tr>
+          <tr
+            *ngFor="
+              let ingredient of ingredientsList;
+              index as index;
+              odd as odd
+            "
+            [class.odd-item-decoration]="index % 2 != 0"
+          >
+            <td>{{ index + 1 }}</td>
+            <td>{{ ingredient.ingredient }}</td>
+            <td>{{ ingredient.quantity }}</td>
+            <td>{{ ingredient.unit }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </form>
+  </section>
+</main>
