@@ -22,6 +22,7 @@ Open browser and search for `http://localhost:8080`.
 ### Front-end tests
 
 Uncomment 'npm test' execution in 'pom.xml' file.
+Install Chrome.
 Run `mvn test`.
 
 ### Back-end tests
