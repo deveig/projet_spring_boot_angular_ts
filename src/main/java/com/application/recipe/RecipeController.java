@@ -29,7 +29,7 @@ public class RecipeController {
     // Checks ingredient then saves it or not. 
 	@PostMapping("") 
     @ExceptionHandler
-    public Map<String, String> checkData(@RequestBody(required = false) Ingredient ingredient) throws IOException {
+    public Map<String, String> checkData(@RequestBody(required = true) Ingredient ingredient) throws IOException {
         Pattern pattern = Pattern.compile("\\D+");
             if (pattern.matcher(ingredient.getIngredient()).matches() && pattern.matcher(ingredient.getUnit()).matches()) {
                 Ingredient newIngredient = new Ingredient();
