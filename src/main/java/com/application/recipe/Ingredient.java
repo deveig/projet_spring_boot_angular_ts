@@ -58,5 +58,9 @@ public class Ingredient {
     public void setUnit(String unit) {
         this.unit = unit;
     }
+
+    public String toString() {
+		return "{\"id\":" + this.id + "," + "\"ingredient\":" + "\"" +  this.ingredient + "\"," + "\"quantity\":" + this.quantity + "," + "\"unit\":" + "\"" + this.unit + "\"" + "}";
+	}
     
 }
