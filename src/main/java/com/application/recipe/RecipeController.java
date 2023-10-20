@@ -1,13 +1,18 @@
 package com.application.recipe;
 
+import jakarta.validation.ConstraintViolationException;
+
 import java.io.IOException;
 import java.util.Map;
 import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -22,24 +27,47 @@ public class RecipeController {
 
     // Sends all ingredients.
 	@GetMapping("")
-    public Iterable<Ingredient> getIngredients() {
-        return ingredientRepository.findAll();
+    public ResponseEntity<Iterable<Ingredient>> getIngredients() throws IOException {
+        return ResponseEntity.ok().body(ingredientRepository.findAll());
+    }
+
+    // Handles 'HttpMessageNotReadableException' and 'ConstraintViolationException' throwing when there is a constraint validation failed.
+    @ExceptionHandler({HttpMessageNotReadableException.class, ConstraintViolationException.class})
+    public ResponseEntity<Map<String, String>> handle(Exception exception) {
+        return ResponseEntity.ok().body(Map.of("message", "Invalid data."));
     }
 
     // Checks ingredient then saves it or not. 
-	@PostMapping("") 
-    @ExceptionHandler
-    public Map<String, String> checkData(@RequestBody(required = true) Ingredient ingredient) throws IOException {
-        Pattern pattern = Pattern.compile("\\D+");
-            if (pattern.matcher(ingredient.getIngredient()).matches() && pattern.matcher(ingredient.getUnit()).matches()) {
-                Ingredient newIngredient = new Ingredient();
-                newIngredient.setIngredient(ingredient.getIngredient());
-                newIngredient.setQuantity(ingredient.getQuantity());
-                newIngredient.setUnit(ingredient.getUnit());
-                ingredientRepository.save(newIngredient);
-                return Map.of("message", "Data are saved.");
-            } else {
-                throw new IOException();
-            }
+	@PostMapping("")
+    public ResponseEntity<Map<String, String>> checkData(@RequestBody(required = true) Ingredient ingredient) throws IOException {
+        Pattern patternIsString = Pattern.compile("\\D+");
+        if (patternIsString.matcher(ingredient.getIngredient()).matches() && patternIsString.matcher(ingredient.getUnit()).matches()) {
+            Ingredient newIngredient = new Ingredient();
+            newIngredient.setIngredient(ingredient.getIngredient());
+            newIngredient.setQuantity(ingredient.getQuantity());
+            newIngredient.setUnit(ingredient.getUnit());
+            ingredientRepository.save(newIngredient);
+            return ResponseEntity.ok().body(Map.of("message", "Data is saved."));
+        } else {
+            return ResponseEntity.ok().body(Map.of("message", "Invalid data."));
+        }
     }
+
+    @DeleteMapping("")
+    public ResponseEntity<Map<String, String>> deleteData() throws IOException {
+        Iterable<Ingredient> ingredients = ingredientRepository.findAll();
+        int count = 0;
+        Ingredient lastIngredient = new Ingredient();
+        for (Ingredient ingredient : ingredients) {
+            lastIngredient = ingredient;
+            count++;
+        }
+        if (count > 0) {
+            ingredientRepository.delete(lastIngredient);
+            return ResponseEntity.ok().body(Map.of("message", "Data is deleted."));
+        } else {
+            return ResponseEntity.ok().body(Map.of("message", "No ingredient to delete."));
+        }
+    }
+    
 }

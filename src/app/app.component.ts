@@ -1,13 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import {
-  AbstractControl,
-  FormControl,
-  FormGroup,
-  ValidationErrors,
-  ValidatorFn,
-  Validators,
-} from '@angular/forms';
-import { EMPTY, Subscription, catchError, tap } from 'rxjs';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { EMPTY, catchError, tap } from 'rxjs';
 import { Ingredient } from './ingredient.model';
 import { IngredientService } from './ingredient.service';
 import { regExpValidator } from './reg_exp_validator.function';
@@ -65,15 +58,18 @@ export class AppComponent implements OnInit {
     this.recipeService
       .getAllIngredients()
       .pipe(
-        tap((ingredientsList: Ingredient[]) => {
-          this.ingredientsList = ingredientsList;
-          this.ingredientsListLength = ingredientsList.length;
-          this.loader = false;
+        tap({
+          next: (ingredientsList: Ingredient[]) => {
+            this.ingredientsList = ingredientsList;
+            this.ingredientsListLength = ingredientsList.length;
+            this.loader = false;
+          },
         }),
         catchError((error: Error) => {
-          this.error = true;
           this.errorMessage =
             'Internal Server Error, please, retry your demand.';
+          this.error = true;
+          this.loader = false;
           // Returns a complete notification.
           return EMPTY;
         })
@@ -81,20 +77,14 @@ export class AppComponent implements OnInit {
       .subscribe();
   }
 
-  /** Saves submitted form ingredient.
-   * @param {SubmitEvent} $event
-   */
-  onSave($event: SubmitEvent) {
-    const form = $event.target as HTMLFormElement;
-    const elementName = form.elements[2] as HTMLInputElement;
-    const name = elementName.value;
-    const elementQuantity = form.elements[3] as HTMLInputElement;
-    const quantity = elementQuantity.value;
-    const elementMetric = form.elements[4] as HTMLInputElement;
-    const metric = elementMetric.value;
+  /** Saves submitted form ingredient. */
+  onSave() {
+    const name = this.name!.value;
+    const quantity = this.quantity!.value;
+    const metric = this.metric!.value;
     const isString = new RegExp(/\D+/);
     const isNumber = new RegExp(/\d+/);
-    const isNegativeNumber = new RegExp(/-d+/);
+    const isNegativeNumber = new RegExp(/-\d+/);
     const isNotEqualToZero = new RegExp(/[^0]/);
     // Checks content of each field.
     if (name !== '' && quantity !== '' && metric !== '') {
@@ -105,40 +95,82 @@ export class AppComponent implements OnInit {
           isNotEqualToZero.test(quantity)
         ) {
           if (metric.length <= 10 && !isNumber.test(metric)) {
+            this.loader = true;
+            this.errorMessage = '';
             this.error = false;
             const quantityNumber = parseInt(quantity);
             this.recipeService
               .save(name, quantityNumber, metric)
               .pipe(
                 tap({
+                  next: (message: { message: string }) => {
+                    if (message.message === 'Invalid data.') {
+                      this.errorMessage = 'Invalid data.';
+                      this.error = true;
+                      this.loader = false;
+                    }
+                  },
                   complete: () => {
                     this.getAllIngredients();
                   },
                 }),
                 catchError((error: Error) => {
-                  this.error = true;
                   this.errorMessage =
                     'Internal Server Error, please, retry your demand.';
+                  this.error = true;
+                  this.loader = false;
                   // Returns a complete notification.
                   return EMPTY;
                 })
               )
               .subscribe();
           } else {
-            this.error = true;
             this.errorMessage = 'Metric is a short word.';
+            this.error = true;
           }
         } else {
-          this.error = true;
           this.errorMessage = 'Quantity is a positive number.';
+          this.error = true;
         }
       } else {
-        this.error = true;
         this.errorMessage = 'Name is a short word.';
+        this.error = true;
       }
     } else {
-      this.error = true;
       this.errorMessage = 'All fields are required.';
+      this.error = true;
     }
+  }
+
+  /** Deletes the last ingredient of the list. */
+  onDelete() {
+    this.loader = true;
+    this.errorMessage = '';
+    this.error = false;
+    this.recipeService
+      .delete()
+      .pipe(
+        tap({
+          next: (message: { message: string }) => {
+            if (message.message === 'No ingredient to delete.') {
+              this.errorMessage = 'No ingredient to delete.';
+              this.error = true;
+              this.loader = false;
+            }
+          },
+          complete: () => {
+            this.getAllIngredients();
+          },
+        }),
+        catchError((error: Error) => {
+          this.errorMessage =
+            'Internal Server Error, please, retry your demand.';
+          this.error = true;
+          this.loader = false;
+          // Returns a complete notification.
+          return EMPTY;
+        })
+      )
+      .subscribe();
   }
 }

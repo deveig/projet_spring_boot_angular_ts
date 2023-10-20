@@ -30,10 +30,16 @@
   </section>
   <section>
     <h2 class="subtitle">Ingredients</h2>
-    <form [formGroup]="ingredientForm" (submit)="onSave($event)">
+    <form [formGroup]="ingredientForm">
       <div class="item-handler">
         Servings:
-        <button type="button" class="less-item" name="minus" value="minus">
+        <button
+          type="button"
+          class="less-item"
+          name="minus"
+          value="minus"
+          (click)="onDelete()"
+        >
           -
         </button>
         <span>{{ ingredientsListLength }}</span>
@@ -43,6 +49,7 @@
           class="more-item"
           name="plus"
           value="plus"
+          (click)="onSave()"
         >
           +
         </button>
