@@ -92,7 +92,7 @@ public class RecipeBehaviorTest {
             // Asserts
             .andDo(print())
             // Asserts
-            .andExpect(status().isOk())
+            .andExpect(status().is(400))
             // Asserts
             .andExpect(content().string(containsString("Invalid data.")));
     }
@@ -134,7 +134,7 @@ public class RecipeBehaviorTest {
             // Asserts
             .andDo(print())
             // Asserts
-            .andExpect(status().isOk())
+            .andExpect(status().is(400))
             // Asserts
             .andExpect(content().string(containsString("No ingredient to delete.")));
     }

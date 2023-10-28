@@ -34,7 +34,7 @@ public class RecipeController {
     // Handles 'HttpMessageNotReadableException' and 'ConstraintViolationException' throwing when there is a constraint validation failed.
     @ExceptionHandler({HttpMessageNotReadableException.class, ConstraintViolationException.class})
     public ResponseEntity<Map<String, String>> handle(Exception exception) {
-        return ResponseEntity.ok().body(Map.of("message", "Invalid data."));
+        return ResponseEntity.badRequest().body(Map.of("message", "Invalid data."));
     }
 
     // Checks ingredient then saves it or not. 
@@ -49,7 +49,7 @@ public class RecipeController {
             ingredientRepository.save(newIngredient);
             return ResponseEntity.ok().body(Map.of("message", "Data is saved."));
         } else {
-            return ResponseEntity.ok().body(Map.of("message", "Invalid data."));
+            return ResponseEntity.badRequest().body(Map.of("message", "Invalid data."));
         }
     }
 
@@ -66,7 +66,7 @@ public class RecipeController {
             ingredientRepository.delete(lastIngredient);
             return ResponseEntity.ok().body(Map.of("message", "Data is deleted."));
         } else {
-            return ResponseEntity.ok().body(Map.of("message", "No ingredient to delete."));
+            return ResponseEntity.badRequest().body(Map.of("message", "No ingredient to delete."));
         }
     }
     

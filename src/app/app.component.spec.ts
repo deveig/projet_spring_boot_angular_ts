@@ -3,7 +3,8 @@ import {
   ComponentFixtureAutoDetect,
   TestBed,
 } from '@angular/core/testing';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
+import { HttpErrorResponse } from '@angular/common/http';
 import { By } from '@angular/platform-browser';
 import { Ingredient } from './ingredient.model';
 import { AppComponent } from './app.component';
@@ -143,8 +144,14 @@ describe('AppComponent', () => {
     // Arranges
     //  Makes the spy of `delete` returns a synchronous Observable with a message.
     // Initializes the test data.
-    const deletionMessage = { message: 'No ingredient to delete.' };
-    recipeService.delete.and.returnValue(of(deletionMessage));
+    const badRequestMessage = 'No ingredient to delete.';
+    const badRequestError = new Error(badRequestMessage);
+    const httpErrorResponse = new HttpErrorResponse({
+      error: badRequestError,
+      status: 400,
+      statusText: 'Bad request',
+    });
+    recipeService.delete.and.returnValue(throwError(() => httpErrorResponse));
     const minusButton = fixture.debugElement.query(By.css('.less-item'));
 
     // Acts
@@ -152,6 +159,6 @@ describe('AppComponent', () => {
 
     // Asserts
     expect(recipeService.delete).toHaveBeenCalledTimes(1);
-    expect(component.errorMessage).toBe(deletionMessage.message);
+    expect(component.errorMessage).toBe(badRequestMessage);
   });
 });

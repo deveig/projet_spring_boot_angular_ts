@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { HttpErrorResponse } from '@angular/common/http';
 import { EMPTY, catchError, tap } from 'rxjs';
 import { Ingredient } from './ingredient.model';
 import { IngredientService } from './ingredient.service';
@@ -65,7 +66,7 @@ export class AppComponent implements OnInit {
             this.loader = false;
           },
         }),
-        catchError((error: Error) => {
+        catchError((error) => {
           this.errorMessage =
             'Internal Server Error, please, retry your demand.';
           this.error = true;
@@ -103,22 +104,22 @@ export class AppComponent implements OnInit {
               .save(name, quantityNumber, metric)
               .pipe(
                 tap({
-                  next: (message: { message: string }) => {
-                    if (message.message === 'Invalid data.') {
-                      this.errorMessage = 'Invalid data.';
-                      this.error = true;
-                      this.loader = false;
-                    }
-                  },
                   complete: () => {
                     this.getAllIngredients();
                   },
                 }),
-                catchError((error: Error) => {
-                  this.errorMessage =
-                    'Internal Server Error, please, retry your demand.';
-                  this.error = true;
-                  this.loader = false;
+                catchError((error) => {
+                  const httpErrorResponse = error as HttpErrorResponse;
+                  if (httpErrorResponse.error.message === 'Invalid data.') {
+                    this.errorMessage = 'Invalid data.';
+                    this.error = true;
+                    this.loader = false;
+                  } else {
+                    this.errorMessage =
+                      'Internal Server Error, please, retry your demand.';
+                    this.error = true;
+                    this.loader = false;
+                  }
                   // Returns a complete notification.
                   return EMPTY;
                 })
@@ -151,22 +152,22 @@ export class AppComponent implements OnInit {
       .delete()
       .pipe(
         tap({
-          next: (message: { message: string }) => {
-            if (message.message === 'No ingredient to delete.') {
-              this.errorMessage = 'No ingredient to delete.';
-              this.error = true;
-              this.loader = false;
-            }
-          },
           complete: () => {
             this.getAllIngredients();
           },
         }),
-        catchError((error: Error) => {
-          this.errorMessage =
-            'Internal Server Error, please, retry your demand.';
-          this.error = true;
-          this.loader = false;
+        catchError((error) => {
+          const httpErrorResponse = error as HttpErrorResponse;
+          if (httpErrorResponse.error.message === 'No ingredient to delete.') {
+            this.errorMessage = 'No ingredient to delete.';
+            this.error = true;
+            this.loader = false;
+          } else {
+            this.errorMessage =
+              'Internal Server Error, please, retry your demand.';
+            this.error = true;
+            this.loader = false;
+          }
           // Returns a complete notification.
           return EMPTY;
         })
