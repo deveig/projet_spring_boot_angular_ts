@@ -53,6 +53,7 @@ public class RecipeController {
         }
     }
 
+    // Removes the last ingredient if there is one.
     @DeleteMapping("")
     public ResponseEntity<Map<String, String>> deleteData() throws IOException {
         Iterable<Ingredient> ingredients = ingredientRepository.findAll();
