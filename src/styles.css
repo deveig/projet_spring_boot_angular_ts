@@ -378,10 +378,21 @@ template {
   display: none;
 }
 
+body {
+  background-color: #edf3e1;
+}
+
 app-root {
   display: flex;
   flex-direction: column;
   align-items: center;
-  font-family: "Roboto", sans-serif;
-  color: rgb(127, 128, 127);
+  background-color: #edf3e1;
+  font-family: Comfortaa, sans-serif;
+  font-size: 12px;
+}
+
+@media screen and (min-width: 1000px) {
+  app-root {
+    font-size: 16px;
+  }
 }
