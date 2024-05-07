@@ -99,6 +99,11 @@ export class AppComponent implements OnInit {
             this.loader = true;
             this.errorMessage = '';
             this.error = false;
+            this.ingredientForm.setValue({
+              name: '',
+              quantity: '',
+              metric: ''
+            });
             const quantityNumber = parseInt(quantity);
             this.recipeService
               .save(name, quantityNumber, metric)
