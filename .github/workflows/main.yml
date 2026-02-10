@@ -19,7 +19,7 @@ jobs:
         cache: maven
     - name: Set database connection properties
       run: |
-        echo "spring.datasource.url=jdbc:h2:mem:testdb" >> src/main/resources/application.properties
+        echo "spring.datasource.url=jdbc:h2:mem:testdb" > src/main/resources/application.properties
         echo "spring.datasource.driverClassName=org.h2.Driver" >> src/main/resources/application.properties
         echo "spring.datasource.username=sa" >> src/main/resources/application.properties
         echo "spring.datasource.password=" >> src/main/resources/application.properties
