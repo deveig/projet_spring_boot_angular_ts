@@ -30,51 +30,35 @@ jobs:
       run: mvn -B test --file pom.xml
     - name: Build with Maven
       run: mvn -B package --file pom.xml
-  backend-docker:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        shell: bash
-        working-directory: ./backend
-    steps:
-      - uses: actions/checkout@v4
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          java-version: '17'
-          distribution: 'semeru'
-          cache: maven
-      - name: Set database connection properties
-        run: |
-          echo "spring.datasource.url=${{ secrets.DB_URL }}" > src/main/resources/application.properties
-          echo "spring.datasource.username=${{ secrets.DB_USERNAME }}" >> src/main/resources/application.properties
-          echo "spring.datasource.password=${{ secrets.DB_PASSWORD }}" >> src/main/resources/application.properties
-          echo "spring.jpa.hibernate.ddl-auto=update" >> src/main/resources/application.properties
-          echo "spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver" >> src/main/resources/application.properties
-          echo "spring.data.rest.base-path=/recipe" >> src/main/resources/application.properties
-      - name: Build with Maven
-        run: mvn -B clean package --file pom.xml
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ vars.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-      - name: Set up Docker Build x
-        uses: docker/setup-buildx-action@v3
-      - name: Build and push app
-        uses: docker/build-push-action@v6
-        with:
-          push: true
-          tags: doc12mp/mysql_app:spring_app
-          context: "{{defaultContext}}:backend"
-      - name: Build and push nginx proxy
-        uses: docker/build-push-action@v6
-        with:
-          push: true
-          tags: doc12mp/mysql_app:spring_nginx
-          context: "{{defaultContext}}:backend/nginx"
+    - name: Set database connection properties
+      run: |
+        echo "spring.datasource.url=${{ secrets.DB_URL }}" > src/main/resources/application.properties
+        echo "spring.datasource.username=${{ secrets.DB_USERNAME }}" >> src/main/resources/application.properties
+        echo "spring.datasource.password=${{ secrets.DB_PASSWORD }}" >> src/main/resources/application.properties
+        echo "spring.jpa.hibernate.ddl-auto=update" >> src/main/resources/application.properties
+        echo "spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver" >> src/main/resources/application.properties
+        echo "spring.data.rest.base-path=/recipe" >> src/main/resources/application.properties
+    - name: Login to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ vars.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v3
+    - name: Set up Docker Build x
+      uses: docker/setup-buildx-action@v3
+    - name: Build and push app
+      uses: docker/build-push-action@v6
+      with:
+        push: true
+        tags: doc12mp/mysql_app:spring_app
+        context: "{{defaultContext}}:backend"
+    - name: Build and push nginx proxy
+      uses: docker/build-push-action@v6
+      with:
+        push: true
+        tags: doc12mp/mysql_app:spring_nginx
+        context: "{{defaultContext}}:backend/nginx"
   frontend-check-code:
       runs-on: ubuntu-latest
       defaults:
