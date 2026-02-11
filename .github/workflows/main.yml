@@ -37,6 +37,7 @@ jobs:
         shell: bash
         working-directory: ./backend
     steps:
+      - uses: actions/checkout@v4
       - name: Setup database configuration
         run: |
           echo "spring.datasource.url=${{ secrets.DB_URL }}" > src/main/resources/application.properties
