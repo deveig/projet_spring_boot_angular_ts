@@ -42,9 +42,9 @@ jobs:
         uses: docker/setup-qemu-action@v3
       - name: Setup database configuration
         run: |
-          echo "spring.datasource.url=${{ secrets.DB_URL }}" >> src/main/resources/application.properties
-          echo "spring.datasource.username=${{ secrets.DB_USERNAME }}" >> src/main/resources/application.properties
-          echo "spring.datasource.password=${{ secrets.DB_PASSWORD }}" >> src/main/resources/application.properties
+          echo "spring.datasource.url=${{ secrets.DB_URL }}" >> ./backend/src/main/resources/application.properties
+          echo "spring.datasource.username=${{ secrets.DB_USERNAME }}" >> ./backend/src/main/resources/application.properties
+          echo "spring.datasource.password=${{ secrets.DB_PASSWORD }}" >> ./backend/src/main/resources/application.properties
       - name: Set up Docker Build x
         uses: docker/setup-buildx-action@v3
       - name: Build and push app
