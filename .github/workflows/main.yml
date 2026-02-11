@@ -30,34 +30,34 @@ jobs:
       run: mvn -B test --file pom.xml
     - name: Build with Maven
       run: mvn -B package --file pom.xml
-  # backend-docker:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Login to Docker Hub
-  #       uses: docker/login-action@v3
-  #       with:
-  #         username: ${{ vars.DOCKERHUB_USERNAME }}
-  #         password: ${{ secrets.DOCKERHUB_TOKEN }}
-  #     - name: Set up QEMU
-  #       uses: docker/setup-qemu-action@v3
-  #     - name: Set up Docker Build x
-  #       uses: docker/setup-buildx-action@v3
-  #     - name: Build and push app
-  #       uses: docker/build-push-action@v6
-  #       with:
-  #         push: true
-  #         tags: doc12mp/mysql_app:spring_app
-  #         context: "{{defaultContext}}:backend"
-  #         build-args: |
-  #           DB_APP_SECRET=${{ secrets.DB_APP_SECRET }}
-  #           DB_URL=${{ secrets.DB_URL }}
-  #           DB_MESSENGER=${{ secrets.DB_MESSENGER }}
-  #     - name: Build and push nginx proxy
-  #       uses: docker/build-push-action@v6
-  #       with:
-  #         push: true
-  #         tags: doc12mp/mysql_app:spring_nginx
-  #         context: "{{defaultContext}}:backend/nginx"
+  backend-docker:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      - name: Set up Docker Build x
+        uses: docker/setup-buildx-action@v3
+      - name: Build and push app
+        uses: docker/build-push-action@v6
+        with:
+          push: true
+          tags: doc12mp/mysql_app:spring_app
+          context: "{{defaultContext}}:backend"
+          build-args: |
+            DB_APP_SECRET=${{ secrets.DB_APP_SECRET }}
+            DB_URL=${{ secrets.DB_URL }}
+            DB_MESSENGER=${{ secrets.DB_MESSENGER }}
+      - name: Build and push nginx proxy
+        uses: docker/build-push-action@v6
+        with:
+          push: true
+          tags: doc12mp/mysql_app:spring_nginx
+          context: "{{defaultContext}}:backend/nginx"
   frontend-check-code:
       runs-on: ubuntu-latest
       defaults:
@@ -76,27 +76,27 @@ jobs:
         - run: npm install
         - run: npm run build --if-present
         - run: npm run test
-  # frontend-docker:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Login to Docker Hub
-  #       uses: docker/login-action@v3
-  #       with:
-  #         username: ${{ vars.DOCKERHUB_USERNAME }}
-  #         password: ${{ secrets.DOCKERHUB_TOKEN }}
-  #     - name: Set up QEMU
-  #       uses: docker/setup-qemu-action@v3
-  #     - name: Set up Docker Build x
-  #       uses: docker/setup-buildx-action@v3
-  #     - name: Build and push
-  #       uses: docker/build-push-action@v6
-  #       with:
-  #         push: true
-  #         tags: doc12mp/mysql_app:angular_app
-  #         context: "{{defaultContext}}:frontend"
-  #     - name: Build and push nginx proxy
-  #       uses: docker/build-push-action@v6
-  #       with:
-  #         push: true
-  #         tags: doc12mp/mysql_app:angular_nginx
-  #         context: "{{defaultContext}}:frontend/nginx"
+  frontend-docker:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      - name: Set up Docker Build x
+        uses: docker/setup-buildx-action@v3
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          push: true
+          tags: doc12mp/mysql_app:angular_app
+          context: "{{defaultContext}}:frontend"
+      - name: Build and push nginx proxy
+        uses: docker/build-push-action@v6
+        with:
+          push: true
+          tags: doc12mp/mysql_app:angular_nginx
+          context: "{{defaultContext}}:frontend/nginx"
