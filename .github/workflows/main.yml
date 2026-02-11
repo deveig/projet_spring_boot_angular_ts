@@ -35,7 +35,7 @@ jobs:
     defaults:
       run:
         shell: bash
-        working-directory: ./backend
+        working-directory: backend
     steps:
       - name: Setup database configuration
         run: |
