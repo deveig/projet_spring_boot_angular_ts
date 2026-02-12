@@ -15,7 +15,7 @@ RUN echo "spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver" >> src/m
 RUN echo "spring.data.rest.base-path=/recipe" >> src/main/resources/application.properties
 RUN mvn -B package --file pom.xml -DskipTests
 
-# FROM ibm-semeru-runtimes:open-17-jdk AS production-stage
-# RUN mkdir /opt/app
-# COPY --from=build-stage /app/target/recipe-0.0.1-SNAPSHOT.jar /opt/app
+FROM ibm-semeru-runtimes:open-17-jdk AS production-stage
+RUN mkdir /opt/app
+COPY --from=build-stage /app/target/recipe-0.0.1-SNAPSHOT.jar /opt/app
 # CMD ["java", "-jar", "/opt/app/recipe-0.0.1-SNAPSHOT.jar"]
