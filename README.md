@@ -29,3 +29,5 @@ Run `mvn test`.
 
 Start MySQL server with MAMP.
 Run `mvn test`.
+
+## GitHub Actions with tests and Docker
