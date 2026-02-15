@@ -1,150 +1,142 @@
-<div class="loader" *ngIf="loader">Please wait.</div>
-<header *ngIf="!loader">
-  <img class="picture" src="./assets/salad.jpg" alt="Salad" />
-  <div>
-    <h1 class="main-title">Salad</h1>
-    <p class="description">Delicious flavored salad !</p>
-  </div>
-</header>
-<main *ngIf="!loader">
-  <section>
-    <h2 class="subtitle">Overview</h2>
-    <dl class="features">
-      <div>
-        <dt class="feature-picture">
-          <div class="rate">
-            <i class="fa-solid fa-star fa-2xs"></i>
-            <i class="fa-solid fa-star fa-2xs"></i>
-            <i class="fa-solid fa-star-half-stroke fa-2xs"></i>
-            <i class="fa-regular fa-star fa-2xs"></i>
-            <i class="fa-regular fa-star fa-2xs"></i>
-          </div>
-        </dt>
-        <dd class="feature">Difficulty</dd>
-      </div>
-      <div>
-        <dt class="feature-picture feature-picture-decoration">7€</dt>
-        <dd class="feature">Cost</dd>
-      </div>
-      <div>
-        <dt class="feature-picture feature-picture-decoration">45min</dt>
-        <dd class="feature">Preparation time</dd>
-      </div>
-      <div>
-        <dt class="feature-picture feature-picture-decoration">0min</dt>
-        <dd class="feature">Cooking time</dd>
-      </div>
-    </dl>
-  </section>
-  <section>
-    <h2 class="subtitle">Ingredients</h2>
-    <form [formGroup]="ingredientForm">
-      <div class="item-handler">
-        <span>Servings: <span>{{ ingredientsListLength }}</span></span>
+
+@if (loader()) {
+  <div class="loader">Please wait...</div>
+} @else {
+  <header>
+    <img class="picture" src="./assets/salad.jpg" alt="Salad" />
+    <div>
+      <h1 class="main-title">Salad</h1>
+      <p class="description">Delicious flavored salad !</p>
+    </div>
+  </header>
+  <main>
+    <section>
+      <h2 class="subtitle">Overview</h2>
+      <dl class="features">
         <div>
-          <button
-            [disabled]="!ingredientForm.valid"
-            type="submit"
-            class="more-item"
-            name="plus"
-            value="plus"
-            (click)="onSave()"
-          >
-            +
-          </button>
-          <button
-            type="button"
-            class="less-item"
-            name="minus"
-            value="minus"
-            (click)="onDelete()"
-          >
-            -
-          </button>
+          <dt class="feature-picture">
+            <div class="rate">
+              <i class="fa-solid fa-star fa-2xs"></i>
+              <i class="fa-solid fa-star fa-2xs"></i>
+              <i class="fa-solid fa-star-half-stroke fa-2xs"></i>
+              <i class="fa-regular fa-star fa-2xs"></i>
+              <i class="fa-regular fa-star fa-2xs"></i>
+            </div>
+          </dt>
+          <dd class="feature">Difficulty</dd>
         </div>
-      </div>
-      <table>
-        <caption class="table-legend">
-          List of the recipe ingredients. Fill fields and click on plus button
-          to add ingredient to your recipe ! Click on minus button to remove it
-          !
-        </caption>
-        <thead>
-          <tr>
-            <th class="item-datas item-number">N°</th>
-            <th class="item-datas"><label for="name">Name</label></th>
-            <th class="item-datas"><label for="quantity">Quantity</label></th>
-            <th class="item-datas"><label for="metric">Metric</label></th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td></td>
-            <td class="item-datas">
-              <input id="name" formControlName="name" />
-            </td>
-            <td class="item-datas">
-              <input id="quantity" formControlName="quantity" />
-            </td>
-            <td class="item-datas">
-              <input id="metric" formControlName="metric" />
-            </td>
-          </tr>
-          <tr>
-            <td class="warning" colspan="4" *ngIf="name!.errors?.['required']">
-              Name is required.
-            </td>
-            <td class="warning" colspan="4" *ngIf="name!.errors?.['maxlength']">
-              Name is too long.
-            </td>
-            <td class="warning" colspan="4" *ngIf="name!.errors?.['forbiddenString']">
-              Name is a word.
-            </td>
-          </tr>
-          <tr>
-            <td class="warning" colspan="4" *ngIf="quantity!.errors?.['required']">
-              Quantity is required.
-            </td>
-            <td
-              class="warning"
-              colspan="4"
-              *ngIf="quantity!.errors?.['forbiddenString']"
-            >
-              Quantity is a positive number.
-            </td>
-            <td class="warning" colspan="4" *ngIf="quantity!.errors?.['pattern']">
-              Quantity is a positive number.
-            </td>
-          </tr>
-          <tr>
-            <td class="warning" colspan="4" *ngIf="metric!.errors?.['required']">
-              Metric is required.
-            </td>
-            <td class="warning" colspan="4" *ngIf="metric!.errors?.['maxlength']">
-              Metric is too long.
-            </td>
-            <td class="warning" colspan="4" *ngIf="metric!.errors?.['forbiddenString']">
-              Metric is a word.
-            </td>
-          </tr>
-          <tr *ngIf="error">
-            <td class="warning" colspan="4">{{ errorMessage }}</td>
-          </tr>
-          <tr
-            *ngFor="
-              let ingredient of ingredientsList;
-              index as index;
-              odd as odd
-            "
-            [class.odd-item-decoration]="index % 2 != 0"
+        <div>
+          <dt class="feature-picture feature-picture-decoration">7€</dt>
+          <dd class="feature">Cost</dd>
+        </div>
+        <div>
+          <dt class="feature-picture feature-picture-decoration">45min</dt>
+          <dd class="feature">Preparation time</dd>
+        </div>
+        <div>
+          <dt class="feature-picture feature-picture-decoration">0min</dt>
+          <dd class="feature">Cooking time</dd>
+        </div>
+      </dl>
+    </section>
+    <section>
+      <h2 class="subtitle">Ingredients</h2>
+      <form [formGroup]="ingredientForm">
+        <div class="item-handler">
+          <span
+            >Servings: <span>{{ ingredientsListLength }}</span></span
           >
-            <td class="item-datas item-number">{{ index + 1 }}</td>
-            <td class="item-datas">{{ ingredient.ingredient }}</td>
-            <td class="item-datas">{{ ingredient.quantity }}</td>
-            <td class="item-datas">{{ ingredient.unit }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </form>
-  </section>
-</main>
+          <div>
+            <button
+              [disabled]="!ingredientForm.valid"
+              type="submit"
+              class="more-item"
+              name="plus"
+              value="plus"
+              (click)="onSave()"
+            >
+              +
+            </button>
+            <button type="button" class="less-item" name="minus" value="minus" (click)="onDelete()">
+              -
+            </button>
+          </div>
+        </div>
+        <table>
+          <caption class="table-legend">
+            List of the recipe ingredients. Fill fields and click on plus button to add ingredient
+            to your recipe ! Click on minus button to remove it !
+          </caption>
+          <thead>
+            <tr>
+              <th class="item-datas item-number">N°</th>
+              <th class="item-datas"><label for="name">Name</label></th>
+              <th class="item-datas"><label for="quantity">Quantity</label></th>
+              <th class="item-datas"><label for="metric">Metric</label></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td></td>
+              <td class="item-datas">
+                <input id="name" formControlName="name" />
+              </td>
+              <td class="item-datas">
+                <input id="quantity" formControlName="quantity" />
+              </td>
+              <td class="item-datas">
+                <input id="metric" formControlName="metric" />
+              </td>
+            </tr>
+            <tr>
+              @if (name!.errors?.['required']) {
+                <td class="warning" colspan="4">Name is required.</td>
+              }
+              @if (name!.errors?.['maxlength']) {
+                <td class="warning" colspan="4">Name is too long.</td>
+              }
+              @if (name!.errors?.['forbiddenString']) {
+                <td class="warning" colspan="4">Name is a word.</td>
+              }
+            </tr>
+            <tr>
+              @if (quantity!.errors?.['required']) {
+                <td class="warning" colspan="4">Quantity is required.</td>
+              }
+              @if (quantity!.errors?.['forbiddenString']) {
+                <td class="warning" colspan="4">Quantity is a positive number.</td>
+              }
+              @if (quantity!.errors?.['pattern']) {
+                <td class="warning" colspan="4">Quantity is a positive number.</td>
+              }
+            </tr>
+            <tr>
+              @if (metric!.errors?.['required']) {
+                <td class="warning" colspan="4">Metric is required.</td>
+              }
+              @if (metric!.errors?.['maxlength']) {
+                <td class="warning" colspan="4">Metric is too long.</td>
+              }
+              @if (metric!.errors?.['forbiddenString']) {
+                <td class="warning" colspan="4">Metric is a word.</td>
+              }
+            </tr>
+            @if (error) {
+              <tr>
+                <td class="warning" colspan="4">{{ errorMessage }}</td>
+              </tr>
+            }
+            @for (ingredient of ingredientsList; track ingredient.id; let index = $index) {
+              <tr>
+                  <td class="item-datas item-number">{{ index + 1 }}</td>
+                  <td class="item-datas">{{ ingredient.ingredient }}</td>
+                  <td class="item-datas">{{ ingredient.quantity }}</td>
+                  <td class="item-datas">{{ ingredient.unit }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </form>
+    </section>
+  </main>
+}

@@ -1,8 +1,4 @@
-import {
-  ComponentFixture,
-  ComponentFixtureAutoDetect,
-  TestBed,
-} from '@angular/core/testing';
+import { ComponentFixture, ComponentFixtureAutoDetect, TestBed } from '@angular/core/testing';
 import { of, throwError } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
 import { By } from '@angular/platform-browser';
@@ -33,7 +29,7 @@ describe('AppComponent', () => {
     recipeService.getAllIngredients.and.returnValue(of(ingredients));
     // Configures the test module.
     TestBed.configureTestingModule({
-      declarations: [AppComponent],
+      imports: [AppComponent],
       providers: [
         AppComponent,
         {
@@ -65,15 +61,9 @@ describe('AppComponent', () => {
     const table = elements.querySelector('tbody')!;
     const ingredientElement = table.lastElementChild!;
     // Expects that elements of the DOM contain values of the test data.
-    expect(ingredientElement.childNodes[1].textContent).toEqual(
-      ingredients[0].ingredient
-    );
-    expect(ingredientElement.childNodes[2].textContent).toEqual(
-      ingredients[0].quantity.toString()
-    );
-    expect(ingredientElement.childNodes[3].textContent).toEqual(
-      ingredients[0].unit
-    );
+    expect(ingredientElement.childNodes[1].textContent).toEqual(ingredients[0].ingredient);
+    expect(ingredientElement.childNodes[2].textContent).toEqual(ingredients[0].quantity.toString());
+    expect(ingredientElement.childNodes[3].textContent).toEqual(ingredients[0].unit);
     // Expects receive ingredients.
     expect(component.ingredientsList).toBe(ingredients);
     // Expects `getAllIngredients` method is called once.
@@ -99,11 +89,7 @@ describe('AppComponent', () => {
     plusButton.triggerEventHandler('click');
 
     // Asserts
-    expect(recipeService.save).toHaveBeenCalledOnceWith(
-      nameData,
-      quantityData,
-      metricData
-    );
+    expect(recipeService.save).toHaveBeenCalledOnceWith(nameData, quantityData, metricData);
     // Expects `getAllIngredients` method is called.
     expect(recipeService.getAllIngredients).toHaveBeenCalledTimes(2);
   });

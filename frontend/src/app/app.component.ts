@@ -1,18 +1,22 @@
-import { Component, OnInit } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { Component, OnInit, signal } from '@angular/core';
+import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
 import { EMPTY, catchError, tap } from 'rxjs';
 import { Ingredient } from './ingredient.model';
 import { IngredientService } from './ingredient.service';
 import { regExpValidator } from './reg_exp_validator.function';
+import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
+  imports: [CommonModule, ReactiveFormsModule],
+  standalone: true,
 })
 export class AppComponent implements OnInit {
-  loader: boolean = true;
+  loader = signal<boolean>(true);
   ingredientsList: Ingredient[] = [];
   ingredientsListLength: number = 0;
   ingredientForm: FormGroup = new FormGroup({
@@ -36,7 +40,7 @@ export class AppComponent implements OnInit {
   error: boolean = false;
   errorMessage: string = '';
 
-  constructor(private recipeService: IngredientService) {}
+  constructor(private recipeService: IngredientService, private router: Router) {}
 
   ngOnInit() {
     this.getAllIngredients();
@@ -63,17 +67,16 @@ export class AppComponent implements OnInit {
           next: (ingredientsList: Ingredient[]) => {
             this.ingredientsList = ingredientsList;
             this.ingredientsListLength = ingredientsList.length;
-            this.loader = false;
+            this.loader.set(false);
           },
         }),
         catchError((error) => {
-          this.errorMessage =
-            'Internal Server Error, please, retry your demand.';
+          this.errorMessage = 'Internal Server Error, please, retry your demand.';
           this.error = true;
-          this.loader = false;
+          this.loader.set(false);
           // Returns a complete notification.
           return EMPTY;
-        })
+        }),
       )
       .subscribe();
   }
@@ -96,13 +99,13 @@ export class AppComponent implements OnInit {
           isNotEqualToZero.test(quantity)
         ) {
           if (metric.length <= 10 && !isNumber.test(metric)) {
-            this.loader = true;
+            this.loader.set(true);
             this.errorMessage = '';
             this.error = false;
             this.ingredientForm.setValue({
               name: '',
               quantity: '',
-              metric: ''
+              metric: '',
             });
             const quantityNumber = parseInt(quantity);
             this.recipeService
@@ -118,16 +121,15 @@ export class AppComponent implements OnInit {
                   if (httpErrorResponse.error.message === 'Invalid data.') {
                     this.errorMessage = 'Invalid data.';
                     this.error = true;
-                    this.loader = false;
+                    this.loader.set(false);
                   } else {
-                    this.errorMessage =
-                      'Internal Server Error, please, retry your demand.';
+                    this.errorMessage = 'Internal Server Error, please, retry your demand.';
                     this.error = true;
-                    this.loader = false;
+                    this.loader.set(false);
                   }
                   // Returns a complete notification.
                   return EMPTY;
-                })
+                }),
               )
               .subscribe();
           } else {
@@ -150,7 +152,7 @@ export class AppComponent implements OnInit {
 
   /** Deletes the last ingredient of the list. */
   onDelete() {
-    this.loader = true;
+    this.loader.set(true);
     this.errorMessage = '';
     this.error = false;
     this.recipeService
@@ -166,16 +168,15 @@ export class AppComponent implements OnInit {
           if (httpErrorResponse.error.message === 'No ingredient to delete.') {
             this.errorMessage = 'No ingredient to delete.';
             this.error = true;
-            this.loader = false;
+            this.loader.set(false);
           } else {
-            this.errorMessage =
-              'Internal Server Error, please, retry your demand.';
+            this.errorMessage = 'Internal Server Error, please, retry your demand.';
             this.error = true;
-            this.loader = false;
+            this.loader.set(false);
           }
           // Returns a complete notification.
           return EMPTY;
-        })
+        }),
       )
       .subscribe();
   }

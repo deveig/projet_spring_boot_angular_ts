@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable, catchError } from 'rxjs';
+import { Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { Ingredient } from './ingredient.model';
 
@@ -7,7 +7,7 @@ import { Ingredient } from './ingredient.model';
   providedIn: 'root',
 })
 export class IngredientService {
-  url: string = 'http://nginx-back:8080/recipe';
+  url: string = '/recipe';
 
   constructor(private http: HttpClient) {}
 
@@ -15,11 +15,7 @@ export class IngredientService {
    * @returns {Observable<Array<Ingredient>>}
    */
   getAllIngredients(): Observable<Ingredient[]> {
-    return this.http.get<Ingredient[]>(this.url).pipe(
-      catchError((error: Error) => {
-        throw error;
-      })
-    );
+    return this.http.get<Ingredient[]>(this.url);
   }
 
   /** Sends ingredient to API.
@@ -31,29 +27,19 @@ export class IngredientService {
   save(
     name: string,
     quantity: number,
-    metric: string
+    metric: string,
   ): Observable<{ message: string }> {
-    return this.http
-      .post<{ message: string }>(this.url, {
-        ingredient: name,
-        quantity: quantity,
-        unit: metric,
-      })
-      .pipe(
-        catchError((error: Error) => {
-          throw error;
-        })
-      );
+    return this.http.post<{ message: string }>(this.url, {
+      ingredient: name,
+      quantity: quantity,
+      unit: metric,
+    });
   }
 
   /** Deletes the last ingredient.
    * @returns {Observable<{message: string}>}
    */
   delete(): Observable<{ message: string }> {
-    return this.http.delete<{ message: string }>(this.url).pipe(
-      catchError((error: Error) => {
-        throw error;
-      })
-    );
+    return this.http.delete<{ message: string }>(this.url);
   }
 }
