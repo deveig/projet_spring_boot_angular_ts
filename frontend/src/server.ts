@@ -17,7 +17,7 @@ const angularApp = new AngularNodeAppEngine();
 
 /**
  * Rest API endpoints
- *
+ * 
  */
 app.use('/recipe', express.raw({ type: '*/*', limit: '10mb' }));
 app.use('/recipe', async (req, res) => {
@@ -29,7 +29,8 @@ app.use('/recipe', async (req, res) => {
     });
     res.status(response.status).json(await response.json());
   } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch recipe' });
+    // res.status(500).json({ error: 'Failed to fetch recipe' });
+    res.status(500).json({ error: 'Failed to fetch recipe', details: error instanceof Error ? error.message : String(error) });
   }
 });
 
