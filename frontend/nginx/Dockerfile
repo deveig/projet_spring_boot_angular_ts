@@ -1,5 +1,5 @@
 FROM nginx:latest
 WORKDIR /
 COPY nginx.conf /etc/nginx/nginx.conf
-RUN openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/nginx.key -out /etc/ssl/certs/nginx.crt -subj "/C=FR/ST=France/L=Paris/O=MyCompany/OU=Dev/DNS=localhost"
+RUN openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/nginx.key -out /etc/ssl/certs/nginx.crt -subj "/C=FR/ST=France/L=Paris/O=MyCompany/OU=Dev/CN=nginx-front"
 CMD ["nginx", "-g", "daemon off;"]

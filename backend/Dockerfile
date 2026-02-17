@@ -17,7 +17,7 @@ RUN echo "server.port=8443" >> src/main/resources/application.properties
 RUN echo "server.ssl.certificate=classpath:my-cert.crt" >> src/main/resources/application.properties
 RUN echo "server.ssl.certificate-private-key=classpath:my-cert.key" >> src/main/resources/application.properties
 #RUN echo "server.ssl.trust-certificate=classpath:ca-cert.crt" >> src/main/resources/application.properties
-RUN openssl req -x509 -newkey rsa:4096 -keyout /app/src/main/resources/my-cert.key -out /app/src/main/resources/my-cert.crt -days 365 -nodes -subj "/C=FR/ST=France/L=Paris/O=MyCompany/OU=Dev/DNS=localhost"
+RUN openssl req -x509 -newkey rsa:4096 -keyout /app/src/main/resources/my-cert.key -out /app/src/main/resources/my-cert.crt -days 365 -nodes -subj "/C=FR/ST=France/L=Paris/O=MyCompany/OU=Dev/CN=back"
 RUN mvn -B package --file pom.xml -DskipTests
 
 FROM ibm-semeru-runtimes:open-17-jdk AS production-stage
