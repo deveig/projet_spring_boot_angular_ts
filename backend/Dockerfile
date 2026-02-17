@@ -13,6 +13,11 @@ RUN echo "spring.datasource.password=$DB_PASSWORD" >> src/main/resources/applica
 RUN echo "spring.jpa.hibernate.ddl-auto=update" >> src/main/resources/application.properties
 RUN echo "spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver" >> src/main/resources/application.properties
 RUN echo "spring.data.rest.base-path=/recipe" >> src/main/resources/application.properties
+RUN echo "server.port=8443" >> src/main/resources/application.properties
+RUN echo "server.ssl.certificate=classpath:my-cert.crt" >> src/main/resources/application.properties
+RUN echo "server.ssl.certificate-private-key=classpath:my-cert.key" >> src/main/resources/application.properties
+#RUN echo "server.ssl.trust-certificate=classpath:ca-cert.crt" >> src/main/resources/application.properties
+RUN openssl req -x509 -newkey rsa:4096 -keyout /app/src/main/resources/my-cert.key -out /app/src/main/resources/my-cert.crt -days 365 -nodes -subj "/CN=localhost"
 RUN mvn -B package --file pom.xml -DskipTests
 
 FROM ibm-semeru-runtimes:open-17-jdk AS production-stage

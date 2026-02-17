@@ -5,6 +5,8 @@ import {
   writeResponseToNodeResponse,
 } from '@angular/ssr/node';
 import express from 'express';
+import https from 'node:https';
+import fs from 'node:fs';
 import { join } from 'node:path';
 // import fetch from 'node-fetch';
 
@@ -20,7 +22,7 @@ const angularApp = new AngularNodeAppEngine();
 app.use('/recipe', express.raw({ type: '*/*', limit: '10mb' }));
 app.use('/recipe', async (req, res) => {
   try {
-    const response = await fetch('http://nginx-back:8080/recipe', {
+    const response = await fetch('https://nginx-back/recipe', {
       method: req.method,
       headers: { ...req.headers } as HeadersInit,
       body: req.method === 'GET' ? undefined : req.body,
@@ -57,13 +59,17 @@ app.use((req, res, next) => {
  * The server listens on the port defined by the `PORT` environment variable, or defaults to 4000.
  */
 if (isMainModule(import.meta.url) || process.env['pm_id']) {
-  const port = process.env['PORT'] || 4000;
-  app.listen(port, (error) => {
-    if (error) {
-      throw error;
-    }
-
-    console.log(`Node Express server listening on http://localhost:${port}`);
+  // const port = process.env['PORT'] || 4000;
+  const port = 443;
+  const options = {
+    key: fs.readFileSync('/etc/ssl/private/app.key'),
+    cert: fs.readFileSync('/etc/ssl/certs/app.crt'),
+  };
+  https.createServer(options, app).listen(port, () => {
+    // if (error) {
+    //   throw error;
+    // }
+    console.log(`Node Express server listening on https://localhost:${port}`);
   });
 }
 
