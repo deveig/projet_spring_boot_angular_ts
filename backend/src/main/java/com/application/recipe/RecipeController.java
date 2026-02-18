@@ -21,7 +21,7 @@ import jakarta.validation.ConstraintViolationException;
 // Brings together @Controller and @ResponseBody.
 @RestController
 @RequestMapping("/recipe")
-@CrossOrigin(origins = "*", allowCredentials = "true", allowedHeaders = "*")
+@CrossOrigin(origins = "https://localhost:8087", allowCredentials = "true", allowedHeaders = "*")
 public class RecipeController {
 
     @Autowired

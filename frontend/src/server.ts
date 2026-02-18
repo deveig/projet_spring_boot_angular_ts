@@ -24,7 +24,7 @@ app.use('/recipe', async (req, res) => {
   try {
     const response = await fetch('https://nginx-back/recipe', {
       method: req.method,
-      headers: { ...req.headers } as HeadersInit,
+      headers: { ...req.headers, 'Access-Control-Allow-Origin': 'https://localhost:8087', 'Access-Control-Allow-Credentials': 'true' } as any,
       body: req.method === 'GET' ? undefined : req.body,
     });
     res.status(response.status).json(await response.json());
