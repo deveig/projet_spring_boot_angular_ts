@@ -6,7 +6,7 @@ import {
 } from '@angular/ssr/node';
 import express from 'express';
 import https from 'node:https';
-import fs from 'node:fs';
+import fs from 'node:fs/promises';
 import { join } from 'node:path';
 // import fetch from 'node-fetch';
 
@@ -17,12 +17,12 @@ const angularApp = new AngularNodeAppEngine();
 
 /**
  * Rest API endpoints
- * 
+ *
  */
 app.use('/recipe', express.raw({ type: '*/*', limit: '10mb' }));
 app.use('/recipe', async (req, res) => {
   try {
-    const response = await fetch('https://nginx-back:443/recipe', {
+    const response = await fetch('https://nginx-back/recipe', {
       method: req.method,
       headers: { ...req.headers } as HeadersInit,
       body: req.method === 'GET' ? undefined : req.body,
@@ -30,7 +30,12 @@ app.use('/recipe', async (req, res) => {
     res.status(response.status).json(await response.json());
   } catch (error) {
     // res.status(500).json({ error: 'Failed to fetch recipe' });
-    res.status(500).json({ error: 'Failed to fetch recipe', details: error instanceof Error ? error.message : String(error) });
+    res
+      .status(500)
+      .json({
+        error: 'Failed to fetch recipe',
+        details: error instanceof Error ? error : String(error),
+      });
   }
 });
 
@@ -60,19 +65,23 @@ app.use((req, res, next) => {
  * The server listens on the port defined by the `PORT` environment variable, or defaults to 4000.
  */
 if (isMainModule(import.meta.url) || process.env['pm_id']) {
-  const port = process.env['PORT'] || 4000;
-  // const port = 443;
-  // const options = {
-  //   key: fs.readFileSync('/etc/ssl/private/app.key'),
-  //   cert: fs.readFileSync('/etc/ssl/certs/app.crt'),
-  // };
-  // https.createServer(options, app).listen(port, () => {
-  app.listen(port, (error) => {
-    if (error) {
-      throw error;
-    }
-    console.log(`Node Express server listening on http://localhost:${port}`);
-  });
+  // const port = process.env['PORT'] || 4000;
+  const port = 443;
+  https
+    .createServer(
+      {
+        key: await fs.readFile('/etc/ssl/private/app.key'),
+        cert: await fs.readFile('/etc/ssl/certs/app.crt'),
+      },
+      app,
+    )
+    .listen(port, () => {
+      // app.listen(port, (error) => {
+      //   if (error) {
+      //     throw error;
+      //   }
+      console.log(`Node Express server listening on http://localhost:${port}`);
+    });
 }
 
 /**

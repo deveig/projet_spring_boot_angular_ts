@@ -7,7 +7,7 @@
     "build": "ng build --configuration production",
     "watch": "ng build --watch --configuration development",
     "test": "ng test --browsers=ChromeHeadless --watch=false",
-    "serve:ssr:my-app": "node --use-system-ca dist/my-app/server/server.mjs"
+    "serve:ssr:my-app": "node dist/my-app/server/server.mjs"
   },
   "prettier": {
     "printWidth": 100,
@@ -34,6 +34,7 @@
     "@angular/ssr": "^21.1.4",
     "express": "^5.1.0",
     "fs": "^0.0.1-security",
+    "fs.promises": "^0.1.2",
     "https": "^1.0.0",
     "node-fetch": "^3.3.2",
     "rxjs": "~7.8.0",
