@@ -34,7 +34,7 @@ app.use('/recipe', async (req, res) => {
       .status(500)
       .json({
         error: 'Failed to fetch recipe',
-        details: error instanceof Error ? error.stack : String(error),
+        details: error instanceof Error ? error.message : String(error),
       });
   }
 });
