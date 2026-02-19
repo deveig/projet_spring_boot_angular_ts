@@ -31,7 +31,7 @@ app.use('/recipe', async (req, res) => {
     res.status(response.status).json(await response.json());
   } catch (error) {
     // res.status(500).json({ error: 'Failed to fetch recipe' });
-    res.status(500).json((error as Error).stack);
+    res.status(500).json((error as Error));
   }
 });
 
