@@ -6,7 +6,7 @@ import {
 } from '@angular/ssr/node';
 import express from 'express';
 import https from 'node:https';
-import fs from 'node:fs/promises';
+import fs from 'node:fs';
 import { join } from 'node:path';
 // import fetch from 'node-fetch';
 
@@ -24,18 +24,17 @@ app.use('/recipe', async (req, res) => {
   try {
     const response = await fetch('https://nginx-back/recipe', {
       method: req.method,
-      headers: { ...req.headers, 'Access-Control-Allow-Origin': 'https://localhost:8087', 'Access-Control-Allow-Credentials': 'true' } as any,
+      headers: { ...req.headers } as HeadersInit,
+      // , 'Access-Control-Allow-Origin': 'https://localhost:8087', 'Access-Control-Allow-Credentials': 'true' } as any,
       body: req.method === 'GET' ? undefined : req.body,
     });
     res.status(response.status).json(await response.json());
   } catch (error) {
     // res.status(500).json({ error: 'Failed to fetch recipe' });
-    res
-      .status(500)
-      .json({
-        error: 'Failed to fetch recipe',
-        details: error instanceof Error ? error.message : String(error),
-      });
+    res.status(500).json({
+      error: 'Failed to fetch recipe',
+      details: error instanceof Error ? error.message : String(error),
+    });
   }
 });
 
@@ -70,8 +69,8 @@ if (isMainModule(import.meta.url) || process.env['pm_id']) {
   https
     .createServer(
       {
-        key: await fs.readFile('/etc/ssl/private/app.key'),
-        cert: await fs.readFile('/etc/ssl/certs/app.crt'),
+        key: fs.readFileSync('/etc/ssl/private/app.key'),
+        cert: fs.readFileSync('/etc/ssl/certs/app.crt'),
       },
       app,
     )
