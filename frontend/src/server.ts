@@ -5,10 +5,7 @@ import {
   writeResponseToNodeResponse,
 } from '@angular/ssr/node';
 import express from 'express';
-import https from 'node:https';
-import fs from 'node:fs';
 import { join } from 'node:path';
-// import fetch from 'node-fetch';
 
 const browserDistFolder = join(import.meta.dirname, '../browser');
 
@@ -22,16 +19,14 @@ const angularApp = new AngularNodeAppEngine();
 app.use('/recipe', express.raw({ type: '*/*', limit: '10mb' }));
 app.use('/recipe', async (req, res) => {
   try {
-    const response = await fetch('https://nginx-back/recipe', {
+    const response = await fetch('https://nginx-back:8080/recipe', {
       method: req.method,
       headers: { ...req.headers } as HeadersInit,
-      // , 'Access-Control-Allow-Origin': 'https://localhost:8087', 'Access-Control-Allow-Credentials': 'true' } as any,
       body: req.method === 'GET' ? undefined : req.body,
     });
     res.status(response.status).json(await response.json());
   } catch (error) {
-    // res.status(500).json({ error: 'Failed to fetch recipe' });
-    res.status(500).json((error as Error));
+    res.status(500).json({ error: 'Failed to fetch recipe' });
   }
 });
 
