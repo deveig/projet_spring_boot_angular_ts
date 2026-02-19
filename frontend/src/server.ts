@@ -19,7 +19,7 @@ const angularApp = new AngularNodeAppEngine();
 app.use('/recipe', express.raw({ type: '*/*', limit: '10mb' }));
 app.use('/recipe', async (req, res) => {
   try {
-    const response = await fetch('https://nginx-back:8080/recipe', {
+    const response = await fetch('http://nginx-back:8080/recipe', {
       method: req.method,
       headers: { ...req.headers } as HeadersInit,
       body: req.method === 'GET' ? undefined : req.body,
