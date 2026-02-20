@@ -7,7 +7,7 @@ import { Ingredient } from './ingredient.model';
   providedIn: 'root',
 })
 export class IngredientService {
-  url: string = '/recipe-spring-angular/recipe';
+  url: string = '/recipe';
 
   constructor(private http: HttpClient) {}
 
