@@ -4,7 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build --configuration production",
+    "build": "ng build --configuration production --base-href /recipe-spring-angular/",
     "watch": "ng build --watch --configuration development",
     "test": "ng test --browsers=ChromeHeadless --watch=false",
     "serve:ssr:my-app": "node dist/my-app/server/server.mjs"
