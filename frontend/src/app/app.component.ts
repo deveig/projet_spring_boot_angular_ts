@@ -3,22 +3,29 @@ import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { HttpErrorResponse } from '@angular/common/http';
 import { EMPTY, catchError, tap } from 'rxjs';
 import { Ingredient } from './ingredient.model';
+import { User } from './user.model';
 import { IngredientService } from './ingredient.service';
 import { regExpValidator } from './reg_exp_validator.function';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-root',
+  imports: [ReactiveFormsModule, CommonModule],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
-  imports: [CommonModule, ReactiveFormsModule],
-  standalone: true,
 })
 export class AppComponent implements OnInit {
   loader = signal<boolean>(true);
+  user: User | null = null;
   ingredientsList: Ingredient[] = [];
   ingredientsListLength: number = 0;
+  userForm: FormGroup = new FormGroup({
+    userName: new FormControl('', [
+      Validators.required,
+      Validators.maxLength(50),
+      regExpValidator(/\d+/),
+    ]),
+  });
   ingredientForm: FormGroup = new FormGroup({
     name: new FormControl('', [
       Validators.required,
@@ -37,13 +44,19 @@ export class AppComponent implements OnInit {
       regExpValidator(/\d+/),
     ]),
   });
-  error: boolean = false;
-  errorMessage: string = '';
+  errorIngredient: boolean = false;
+  errorUser: boolean = false;
+  errorMessageIngredient: string = '';
+  errorMessageUser: string = '';
 
-  constructor(private recipeService: IngredientService, private router: Router) {}
+  constructor(private recipeService: IngredientService) {}
 
   ngOnInit() {
-    this.getAllIngredients();
+    this.getUser();
+  }
+
+  get userName() {
+    return this.userForm.get('userName');
   }
 
   get name() {
@@ -58,126 +71,212 @@ export class AppComponent implements OnInit {
     return this.ingredientForm.get('metric');
   }
 
+  /** Adds recipe user to `user`. */
+  getUser() {
+    if (localStorage.getItem('user') != null) {
+      this.recipeService
+        .getUser()
+        .pipe(
+          tap({
+            next: (value) => {
+              if (value.token.id != null) {
+                this.user = value.token;
+              }
+              this.getAllIngredients();
+            },
+          }),
+          catchError((error) => {
+            const httpErrorResponse = error as HttpErrorResponse;
+            if (httpErrorResponse.error.message === 'Bad request.') {
+              this.errorMessageUser =
+                'Internal Server Error, please, retry your demand.';
+            } else {
+              this.errorMessageUser =
+                'Internal Server Error, please, retry your demand.';
+            }
+            this.loader.set(false);
+            // Returns a complete notification.
+            return EMPTY;
+          })
+        )
+        .subscribe();
+      } else {
+        this.getAllIngredients();
+      }
+  }
+
+  /** Saves submitted form user. */
+  onSaveUser() {
+    const userName = this.userName!.value;
+    const isNumber = new RegExp(/\d+/);
+    // Checks content of each field.
+    if (userName != '') {
+      if (userName.length <= 50 && !isNumber.test(userName)) {
+        this.loader.set(true);
+        this.errorMessageUser = '';
+        this.userForm.setValue({
+          userName: '',
+        });
+        this.recipeService
+          .saveUser(userName)
+          .pipe(
+            tap({
+              next: (value) => {
+                this.user = value.token;
+                localStorage.setItem('user', JSON.stringify(value.token));
+                this.getAllIngredients();
+              },
+            }),
+            catchError((error) => {
+              const httpErrorResponse = error as HttpErrorResponse;
+              if (httpErrorResponse.error.message === 'Enter your name.') {
+                this.errorMessageUser = 'Enter your name.';
+                this.loader.set(false);
+              } else {
+                this.errorMessageUser =
+                  'Internal Server Error, please, retry your demand.';
+                this.loader.set(false);
+              }
+              // Returns a complete notification.
+              return EMPTY;
+            })
+          )
+          .subscribe();
+      } else {
+        this.errorMessageUser = 'Enter your name.';
+      }
+    } else {
+      this.errorMessageUser = 'Enter your name.';
+    }
+  }
+
   /** Adds recipe ingredients to `ingredientsList`. */
   getAllIngredients() {
-    this.recipeService
-      .getAllIngredients()
-      .pipe(
-        tap({
-          next: (ingredientsList: Ingredient[]) => {
-            this.ingredientsList = ingredientsList;
-            this.ingredientsListLength = ingredientsList.length;
+    if (localStorage.getItem('user') != null) {
+      this.recipeService
+        .getAllIngredients()
+        .pipe(
+          tap({
+            next: (value) => {
+              this.ingredientsList = value.ingredientsList;
+              this.ingredientsListLength = value.ingredientsList.length;
+              this.loader.set(false);
+            },
+          }),
+          catchError((error) => {
+            this.errorMessageIngredient =
+              'Internal Server Error, please, retry your demand.';
             this.loader.set(false);
-          },
-        }),
-        catchError((error) => {
-          this.errorMessage = 'Internal Server Error, please, retry your demand.';
-          this.error = true;
-          this.loader.set(false);
-          // Returns a complete notification.
-          return EMPTY;
-        }),
-      )
-      .subscribe();
+
+            // Returns a complete notification.
+            return EMPTY;
+          })
+        )
+        .subscribe();
+    } else {
+      this.ingredientsList = [];
+      this.errorMessageUser = 'Enter your name.';
+      this.loader.set(false);
+    }
   }
 
   /** Saves submitted form ingredient. */
   onSave() {
-    const name = this.name!.value;
-    const quantity = this.quantity!.value;
-    const metric = this.metric!.value;
-    const isString = new RegExp(/\D+/);
-    const isNumber = new RegExp(/\d+/);
-    const isNegativeNumber = new RegExp(/-\d+/);
-    const isNotEqualToZero = new RegExp(/[^0]/);
-    // Checks content of each field.
-    if (name !== '' && quantity !== '' && metric !== '') {
-      if (name.length <= 25 && !isNumber.test(name)) {
-        if (
-          !isString.test(quantity) &&
-          !isNegativeNumber.test(quantity) &&
-          isNotEqualToZero.test(quantity)
-        ) {
-          if (metric.length <= 10 && !isNumber.test(metric)) {
-            this.loader.set(true);
-            this.errorMessage = '';
-            this.error = false;
-            this.ingredientForm.setValue({
-              name: '',
-              quantity: '',
-              metric: '',
-            });
-            const quantityNumber = parseInt(quantity);
-            this.recipeService
-              .save(name, quantityNumber, metric)
-              .pipe(
-                tap({
-                  complete: () => {
-                    this.getAllIngredients();
-                  },
-                }),
-                catchError((error) => {
-                  const httpErrorResponse = error as HttpErrorResponse;
-                  if (httpErrorResponse.error.message === 'Invalid data.') {
-                    this.errorMessage = 'Invalid data.';
-                    this.error = true;
+    if (localStorage.getItem('user') != null) {
+      const name = this.name!.value;
+      const quantity = this.quantity!.value;
+      const metric = this.metric!.value;
+      const isString = new RegExp(/\D+/);
+      const isNumber = new RegExp(/\d+/);
+      const isNegativeNumber = new RegExp(/-\d+/);
+      const isNotEqualToZero = new RegExp(/[^0]/);
+      // Checks content of each field.
+      if (name !== '' && quantity !== '' && metric !== '') {
+        if (name.length <= 25 && !isNumber.test(name)) {
+          if (
+            !isString.test(quantity) &&
+            !isNegativeNumber.test(quantity) &&
+            isNotEqualToZero.test(quantity)
+          ) {
+            if (metric.length <= 10 && !isNumber.test(metric)) {
+              this.loader.set(true);
+              this.errorMessageIngredient = '';
+              this.ingredientForm.setValue({
+                name: '',
+                quantity: '',
+                metric: '',
+              });
+              const quantityNumber = parseInt(quantity);
+              this.recipeService
+                .save(name, quantityNumber, metric)
+                .pipe(
+                  tap({
+                    complete: () => {
+                      this.getAllIngredients();
+                    },
+                  }),
+                  catchError((error) => {
+                    const httpErrorResponse = error as HttpErrorResponse;
+                    if (httpErrorResponse.error.message === 'Invalid data.') {
+                      this.errorMessageIngredient = 'Invalid data.';
+                    } else {
+                      this.errorMessageIngredient =
+                        'Internal Server Error, please, retry your demand.';
+                    }
                     this.loader.set(false);
-                  } else {
-                    this.errorMessage = 'Internal Server Error, please, retry your demand.';
-                    this.error = true;
-                    this.loader.set(false);
-                  }
-                  // Returns a complete notification.
-                  return EMPTY;
-                }),
-              )
-              .subscribe();
+                    // Returns a complete notification.
+                    return EMPTY;
+                  })
+                )
+                .subscribe();
+            } else {
+              this.errorMessageIngredient = 'Metric is a short word.';
+            }
           } else {
-            this.errorMessage = 'Metric is a short word.';
-            this.error = true;
+            this.errorMessageIngredient = 'Quantity is a positive number.';
           }
         } else {
-          this.errorMessage = 'Quantity is a positive number.';
-          this.error = true;
+          this.errorMessageIngredient = 'Name is a short word.';
         }
       } else {
-        this.errorMessage = 'Name is a short word.';
-        this.error = true;
+        this.errorMessageIngredient = 'All fields are required.';
       }
     } else {
-      this.errorMessage = 'All fields are required.';
-      this.error = true;
+      this.errorMessageUser = 'Enter your name.';
     }
   }
 
   /** Deletes the last ingredient of the list. */
   onDelete() {
-    this.loader.set(true);
-    this.errorMessage = '';
-    this.error = false;
-    this.recipeService
-      .delete()
-      .pipe(
-        tap({
-          complete: () => {
-            this.getAllIngredients();
-          },
-        }),
-        catchError((error) => {
-          const httpErrorResponse = error as HttpErrorResponse;
-          if (httpErrorResponse.error.message === 'No ingredient to delete.') {
-            this.errorMessage = 'No ingredient to delete.';
-            this.error = true;
+    if (localStorage.getItem('user') != null) {
+      this.loader.set(true);
+      this.errorMessageIngredient = '';
+      this.recipeService
+        .delete()
+        .pipe(
+          tap({
+            complete: () => {
+              this.getAllIngredients();
+            },
+          }),
+          catchError((error) => {
+            const httpErrorResponse = error as HttpErrorResponse;
+            if (
+              httpErrorResponse.error.message === 'No ingredient to delete.'
+            ) {
+              this.errorMessageIngredient = 'No ingredient to delete.';
+            } else {
+              this.errorMessageIngredient =
+                'Internal Server Error, please, retry your demand.';
+            }
             this.loader.set(false);
-          } else {
-            this.errorMessage = 'Internal Server Error, please, retry your demand.';
-            this.error = true;
-            this.loader.set(false);
-          }
-          // Returns a complete notification.
-          return EMPTY;
-        }),
-      )
-      .subscribe();
+            // Returns a complete notification.
+            return EMPTY;
+          })
+        )
+        .subscribe();
+    }  else {
+      this.errorMessageUser = 'Enter your name.';
+    }
   }
 }

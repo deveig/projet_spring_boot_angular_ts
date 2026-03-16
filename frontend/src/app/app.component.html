@@ -1,11 +1,62 @@
-
 @if (loader()) {
   <div class="loader">Please wait...</div>
 } @else {
   <header>
-    <img class="picture" src="./assets/salad.jpg" alt="Salad" />
+    <img class="picture" src="assets/salad.jpg" alt="Salad" />
     <div>
-      <h1 class="main-title">Salad</h1>
+      <h1 class="main-title">
+        Salad made by
+        @if (user == null) {
+          <form class="form-title" [formGroup]="userForm">
+            <table>
+              <thead>
+                <tr>
+                  <th class="item-datas">
+                    <label for="userName">Your name</label>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="item-datas">
+                    <input id="userName" formControlName="userName" />
+                  </td>
+                  <td>
+                    <button
+                      [disabled]="!userForm.valid"
+                      type="submit"
+                      class="more-user"
+                      name="plus"
+                      value="plus"
+                      (click)="onSaveUser()"
+                    >
+                      +
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  @if (errorMessageUser != '') {
+                    <td class="warning">
+                      {{ errorMessageUser }}
+                    </td>
+                  }
+                  @if (userName!.errors?.['required'] && errorMessageUser == '') {
+                    <td class="warning">Enter your name.</td>
+                  }
+                  @if (userName!.errors?.['maxlength'] && errorMessageUser == '') {
+                    <td class="warning">Enter your name.</td>
+                  }
+                  @if (userName!.errors?.['forbiddenString'] && errorMessageUser == '') {
+                    <td class="warning">Enter your name.</td>
+                  }
+                </tr>
+              </tbody>
+            </table>
+          </form>
+        } @else {
+          <span>{{ user.userName }}</span>
+        }
+      </h1>
       <p class="description">Delicious flavored salad !</p>
     </div>
   </header>
@@ -121,17 +172,17 @@
                 <td class="warning" colspan="4">Metric is a word.</td>
               }
             </tr>
-            @if (error) {
+            @if (errorMessageIngredient != '') {
               <tr>
-                <td class="warning" colspan="4">{{ errorMessage }}</td>
+                <td class="warning" colspan="4">{{ errorMessageIngredient }}</td>
               </tr>
             }
             @for (ingredient of ingredientsList; track ingredient.id; let index = $index) {
               <tr>
-                  <td class="item-datas item-number">{{ index + 1 }}</td>
-                  <td class="item-datas">{{ ingredient.ingredient }}</td>
-                  <td class="item-datas">{{ ingredient.quantity }}</td>
-                  <td class="item-datas">{{ ingredient.unit }}</td>
+                <td class="item-datas item-number">{{ index + 1 }}</td>
+                <td class="item-datas">{{ ingredient.ingredient }}</td>
+                <td class="item-datas">{{ ingredient.quantity }}</td>
+                <td class="item-datas">{{ ingredient.unit }}</td>
               </tr>
             }
           </tbody>

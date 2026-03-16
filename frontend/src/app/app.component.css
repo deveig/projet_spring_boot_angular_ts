@@ -41,7 +41,7 @@ section {
   padding: 30px;
 }
 
-.features>div {
+.features > div {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -79,6 +79,13 @@ form {
   padding: 0% 10%;
 }
 
+.form-title {
+  margin: 10% 0%;
+  padding: 0% 0%;
+  font-family: Comfortaa, sans-serif;
+  font-size: 12px;
+}
+
 .item-handler {
   display: flex;
   flex-direction: row;
@@ -86,7 +93,7 @@ form {
   margin: 20px 0px;
 }
 
-.item-handler>div {
+.item-handler > div {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
