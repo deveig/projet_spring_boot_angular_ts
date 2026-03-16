@@ -21,11 +21,6 @@ export class IngredientService {
       .post<{ token: User }>(this.url + '/user', {
         userName: userName,
       })
-      .pipe(
-        catchError((error: Error) => {
-          throw error;
-        }),
-      );
   }
 
   /** Collects recipe user.
@@ -38,11 +33,6 @@ export class IngredientService {
           Authorization: `Bearer ${JSON.stringify(localStorage.getItem('user'))}`,
         },
       })
-      .pipe(
-        catchError((error: Error) => {
-          throw error;
-        }),
-      );
   }
 
   /** Collects recipe ingredients.
@@ -55,11 +45,6 @@ export class IngredientService {
           Authorization: `Bearer ${JSON.stringify(localStorage.getItem('user'))}`,
         },
       })
-      .pipe(
-        catchError((error: Error) => {
-          throw error;
-        }),
-      );
   }
 
   /** Sends ingredient to API.
@@ -87,11 +72,6 @@ export class IngredientService {
           },
         },
       )
-      .pipe(
-        catchError((error: Error) => {
-          throw error;
-        }),
-      );
   }
 
   /** Deletes the last ingredient.
@@ -104,10 +84,5 @@ export class IngredientService {
           Authorization: `Bearer ${JSON.stringify(localStorage.getItem('user'))}`,
         },
       })
-      .pipe(
-        catchError((error: Error) => {
-          throw error;
-        }),
-      );
   }
 }

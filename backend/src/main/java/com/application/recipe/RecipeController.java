@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,7 +24,6 @@ import jakarta.validation.ConstraintViolationException;
 // Brings together @Controller and @ResponseBody.
 @RestController
 @RequestMapping("/recipe")
-@CrossOrigin({"https://localhost:8092", "https://localhost"})
 public class RecipeController {
 
     @Autowired

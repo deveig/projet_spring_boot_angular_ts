@@ -19,7 +19,7 @@ const angularApp = new AngularNodeAppEngine();
 app.use('/recipe-spring-angular/recipe', express.raw({ type: '*/*', limit: '10mb' }));
 app.use('/recipe-spring-angular/recipe', async (req, res) => {
   try {
-    const response = await fetch('http://nginx-back:8080/recipe', {
+    const response = await fetch(`http://nginx-back:8080${req.originalUrl.split('/recipe-spring-angular')[1]}`, {
       method: req.method,
       headers: { ...req.headers } as HeadersInit,
       body: req.method === 'GET' ? undefined : req.body,
