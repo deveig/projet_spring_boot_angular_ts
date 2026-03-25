@@ -25,7 +25,7 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         //configuration.addAllowedOrigin("http://localhost:5500"); // Live server
         configuration.addAllowedOrigin("https://localhost:8092"); // Angular
-        configuration.addAllowedOrigin("http://localhost:8087");
+        configuration.addAllowedOrigin("https://www.deveigportfoliocm.fr");
         configuration.addAllowedOrigin("https://localhost");
         configuration.addAllowedMethod("*");
         configuration.addAllowedHeader("*");
